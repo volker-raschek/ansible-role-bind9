@@ -84,9 +84,6 @@ steps:
     - changed
     - failure
 
-depends_on:
-- latest-manifest
-
 trigger:
   branch:
   - master
