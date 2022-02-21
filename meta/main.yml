@@ -1,6 +1,6 @@
 galaxy_info:
   author: Markus Pesch
-  description: set up native bind
+  description: Role to install and configure bind9 on different distributions
   company: Cryptic Systems
   license: MIT
   min_ansible_version: 2.1

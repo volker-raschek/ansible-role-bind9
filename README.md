@@ -1,6 +1,15 @@
-# bind
+# bind9-role
+
+[![Build Status](https://drone.cryptic.systems/api/badges/volker.raschek/bind9-role/status.svg)](https://drone.cryptic.systems/volker.raschek/bind9-role)
+[![Ansible Role](https://img.shields.io/ansible/role/d/58170)](https://galaxy.ansible.com/volker_raschek/bind9_role)
 
 With following role can be bind installed and configured.
+
+## Installation
+
+```bash
+ansible-galaxy install volker_raschek.bind9_role
+```
 
 ## Supported distributions
 
