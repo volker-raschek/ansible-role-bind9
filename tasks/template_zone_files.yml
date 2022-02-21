@@ -1,0 +1,27 @@
+---
+
+- name: create directory for zone {{ zone.file | dirname }}
+  file:
+    path: "{{ bind_config_directory }}/{{ zone.file | dirname }}"
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: 0755
+    state: directory
+  with_items:
+  - "{{ view.zones }}"
+  loop_control:
+    loop_var: zone
+
+- name: "template view {{ view.name }}"
+  template:
+    src: "{{ inventory_hostname }}/etc/named/{{ zone.file }}.j2"
+    dest: "{{ bind_config_directory }}/{{ zone.file }}"
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: 0644
+  with_items:
+  - "{{ view.zones }}"
+  loop_control:
+    loop_var: zone
+  when: zone.type == 'master'
+  notify: restart named

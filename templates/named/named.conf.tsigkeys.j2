@@ -1,0 +1,11 @@
+#
+# {{ ansible_managed }}
+#
+
+{% for key in bind9_tsigkeys %}
+key "{{ key.name }}" {
+  algorithm {{ key.algorithm }};
+  secret "{{ key.secret }}";
+};
+
+{% endfor %}

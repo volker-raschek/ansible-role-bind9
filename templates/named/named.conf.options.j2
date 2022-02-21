@@ -1,0 +1,233 @@
+#
+# {{ ansible_managed }}
+#
+
+options {
+
+  # This specifies which hosts are allowed to ask ordinary DNS questions.
+  # allow-query may also be specified in the zone statement, in which case it
+  # overrides the options allow-query statement. If not specified, the default
+  # is to allow queries from all hosts.
+  # https://bind9.readthedocs.io/en/latest/reference.html#access-control
+{% if bind9_options.allow_query is defined and bind9_options.allow_query | length > 0 %}
+  allow-query {
+{% for entry in bind9_options.allow_query %}
+    {{ entry }};
+{% endfor %}
+  };
+{% else %}
+  # allow-query {};
+{% endif %}
+
+  # This specifies which hosts are allowed to get answers from the cache. If
+  # allow-recursion is not set, BIND checks to see if the following parameters
+  # are set, in order: allow-query-cache and allow-query (unless recursion no;
+  # is set). If neither of those parameters is set, the default (localnets;
+  # localhost;) is used.
+  # https://bind9.readthedocs.io/en/latest/reference.html#access-control
+{% if bind9_options.allow_query_on is defined and bind9_options.allow_query_on | length > 0 %}
+  allow-query-on {
+{% for entry in bind9_options.allow_query_on %}
+    {{ entry }};
+{% endfor %}
+  };
+{% else %}
+  # allow-query-on {};
+{% endif %}
+
+  # This specifies which hosts are allowed to get answers from the cache. If
+  # allow-recursion is not set, BIND checks to see if the following parameters
+  # are set, in order: allow-query-cache and allow-query (unless recursion no;
+  # is set). If neither of those parameters is set, the default (localnets;
+  # localhost;) is used.
+  # https://bind9.readthedocs.io/en/latest/reference.html#access-control
+{% if bind9_options.allow_query_cache is defined and bind9_options.allow_query_cache | length > 0 %}
+  allow-query-cache {
+{% for entry in bind9_options.allow_query_cache %}
+    {{ entry }};
+{% endfor %}
+  };
+{% else %}
+  # allow-query-cache {};
+{% endif %}
+
+  # This specifies which local addresses can send answers from the cache. If
+  # allow-query-cache-on is not set, then allow-recursion-on is used if set.
+  # Otherwise, the default is to allow cache responses to be sent from any
+  # address. Note: both allow-query-cache and allow-query-cache-on must be
+  # satisfied before a cache response can be sent; a client that is blocked by
+  # one cannot be allowed by the other.
+  # https://bind9.readthedocs.io/en/latest/reference.html#access-control
+{% if bind9_options.allow_query_cache_on is defined and bind9_options.allow_query_cache_on | length > 0 %}
+  allow-query-cache-on {
+{% for entry in bind9_options.allow_query_cache_on %}
+    {{ entry }};
+{% endfor %}
+  };
+{% else %}
+  # allow-query-cache-on {};
+{% endif %}
+
+  # This specifies which hosts are allowed to receive zone transfers from the
+  # server. allow-transfer may also be specified in the zone statement, in which
+  # case it overrides the allow-transfer statement set in options or view. If
+  # not specified, the default is to allow transfers to all hosts.
+
+  # The transport level limitations can also be specified. In particular, zone
+  # transfers can be restricted to a specific port and/or DNS transport protocol
+  # by using the options port and transport. Either option can be specified; if
+  # both are used, both constraints must be satisfied in order for the transfer
+  # to be allowed. Zone transfers are currently only possible via the TCP and
+  # TLS transports.
+{% if bind9_options.allow_recursion is defined and bind9_options.allow_recursion | length > 0 %}
+  allow-recursion {
+{% for entry in bind9_options.allow_recursion %}
+    {{ entry }};
+{% endfor %}
+  };
+{% else %}
+  # allow-recursion {};
+{% endif %}
+
+  # allow-recursion-on defines the server interface(s) from which
+  # recursive queries are accepted and can be useful where a server is
+  # multi-homed, perhaps in conjunction with a view clause. Defaults to
+  # allow-recursion-on {any;}; meaning that recursive queries are
+  # accepted on any server interface.
+  #
+  # NOTE:
+  # - The statement is only relevant if recursion yes; is present or
+  #   defaulted.
+  # - The statements may be used in a view or a global options clause.
+{% if bind9_options.allow_recursion_on is defined and bind9_options.allow_recursion_on | length > 0 %}
+  allow-recursion-on {
+{% for entry in bind9_options.allow_recursion_on %}
+    {{ entry }};
+{% endfor %}
+  };
+{% else %}
+  # allow-recursion-on {};
+{% endif %}
+
+  # allow-transfer defines a match list e.g. IP address(es) that are
+  # allowed to transfer (copy) the zone information from the server
+  # (master or slave for the zone). The default behaviour is to allow
+  # zone transfers to any host. While on its face this may seem an
+  # excessively friendly default, DNS data is essentially public (that's
+  # why its there) and the bad guys can get all of it anyway. However if
+  # the thought of anyone being able to transfer your precious zone file
+  # is repugnant, or (and this is far more significant) you are
+  # concerned about possible DoS attack initiated by XFER requests, then
+  # use the following policy.
+  #
+  # NOTE:
+  # - This statement may be used in a zone, view or global options clause.
+{% if bind9_options.allow_transfer is defined and bind9_options.allow_transfer | length > 0 %}
+  allow-transfer {
+{% for entry in bind9_options.allow_transfer %}
+    {{ entry }};
+{% endfor %}
+  };
+{% else %}
+  # allow-transfer {};
+{% endif %}
+
+  # When set in the zone statement for a primary zone, this specifies which
+  # hosts are allowed to submit Dynamic DNS updates to that zone. The default is
+  # to deny updates from all hosts.
+
+  # Note that allowing updates based on the requestor’s IP address is insecure;
+  # see Dynamic Update Security for details.
+{% if bind9_options.allow_update is defined and bind9_options.allow_update | length > 0 %}
+  allow-update {
+{% for entry in bind9_options.allow_update %}
+    {{ entry }};
+{% endfor %}
+  };
+{% else %}
+  # allow-update {};
+{% endif %}
+
+  # When set in the zone statement for a secondary zone, this specifies which
+  # hosts are allowed to submit Dynamic DNS updates and have them be forwarded
+  # to the primary. The default is { none; }, which means that no update
+  # forwarding is performed.
+
+  # To enable update forwarding, specify allow-update-forwarding { any; }; in
+  # the zone statement. Specifying values other than { none; } or { any; } is
+  # usually counterproductive; the responsibility for update access control
+  # should rest with the primary server, not the secondary.
+{% if bind9_options.allow_update_forwarding is defined and bind9_options.allow_update_forwarding | length > 0 %}
+  allow-update-forwarding {
+{% for entry in bind9_options.allow_update_forwarding %}
+    {{ entry }};
+{% endfor %}
+  };
+{% else %}
+  # allow-update-forwarding {};
+{% endif %}
+
+  directory "/etc/named";
+
+  dnssec-validation {{ bind9_options.dnssec_validation | default('no') }};
+
+  # dump-file "/var/bind/named.dump";
+
+{% if bind9_options.forwarders is defined and bind9_options.forwarders | length > 0 %}
+  forwarders {
+{% for forwarder in bind9_options.forwarders %}
+    {{ forwarder }};
+{% endfor %}
+  };
+{% else %}
+  # forwarders {};
+{% endif %}
+
+  geoip-directory "/usr/share/GeoIP";
+
+  # This is the hostname the server should report via a query of the name
+  # hostname.bind with type TXT and class CHAOS. This defaults to the hostname
+  # of the machine hosting the name server, as found by the gethostname()
+  # function. The primary purpose of such queries is to identify which of a
+  # group of anycast servers is actually answering the queries. Specifying
+  # hostname none; disables processing of the queries.
+  # https://bind9.readthedocs.io/en/latest/reference.html?highlight=hostname#built-in-server-information-zones
+  hostname none;
+
+{% if bind9_options.listen_on_ipv4 is defined and bind9_options.listen_on_ipv4 | length > 0 %}
+  listen-on port 53 {
+{% for ip in bind9_options.listen_on_ipv4 %}
+    {{ ip }};
+{% endfor %}
+  };
+{% endif %}
+
+{% if bind9_options.listen_on_ipv6 is defined and bind9_options.listen_on_ipv6 | length > 0 %}
+  listen-on-v6 port 53 {
+{% for ip in bind9_options.listen_on_ipv6 %}
+    {{ ip }};
+{% endfor %}
+  };
+{% endif %}
+
+  # managed-keys-directory "/var/named/dynamic";
+  # memstatistics-file "/var/bind/named.memstats";
+  minimal-responses {{ bind9_options.minimal_responses }};
+  notify {{ bind9_options.notify }};
+
+  pid-file "/run/named/named.pid";
+  recursion {{ bind9_options.recursion }};
+
+  # statistics-file "/var/bind/named.stats";
+
+  transfer-format {{ bind9_options.transfer_format }};
+
+  # This is the version the server should report via a query of the name
+  # version.bind with type TXT and class CHAOS. The default is the real version
+  # number of this server. Specifying version none disables processing of the
+  # queries.
+  # https://bind9.readthedocs.io/en/latest/reference.html?highlight=hostname#built-in-server-information-zones
+  version none;
+
+  zone-statistics yes;
+};

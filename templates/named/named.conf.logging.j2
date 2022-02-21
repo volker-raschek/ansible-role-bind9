@@ -1,0 +1,31 @@
+#
+# {{ ansible_managed }}
+#
+
+logging {
+
+{% for category in bind9_logging.categories %}
+  category {{ category.name }} {
+{% for channel in category.channels %}
+    {{ channel }};
+{% endfor %}
+  };
+
+{% endfor %}
+
+{% for channel in bind9_logging.channels %}
+  channel {{ channel.name }} {
+{%if channel.file.path is defined and channel.file.options is defined %}
+    file "{{ channel.file.path }}" {{ channel.file.options }};
+{% endif %}
+{%if channel.file.path is defined and channel.file.options is not defined %}
+    file "{{ channel.file.path }}";
+{% endif %}
+{%if channel.severity is defined %}
+    severity {{ channel.severity }};
+{% endif %}
+    print-time yes;
+  };
+
+{% endfor %}
+};

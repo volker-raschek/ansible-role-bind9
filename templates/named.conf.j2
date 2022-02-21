@@ -1,0 +1,12 @@
+# zone "." IN {
+#   type hint;
+#   file "named.ca";
+# };
+
+include "/etc/named/named.conf.acl";
+include "/etc/named/named.conf.logging";
+include "/etc/named/named.conf.options";
+include "/etc/named/named.conf.tsigkeys";
+include "/etc/named/named.conf.views";
+# include "/etc/named.rfc1912.zones";
+# include "/etc/named.root.key";

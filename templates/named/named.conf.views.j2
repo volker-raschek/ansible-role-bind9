@@ -1,0 +1,191 @@
+#
+# {{ ansible_managed }}
+#
+
+{% for view in bind9_views %}
+view "{{ view.name }}" {
+
+  match-clients {
+{% for clients in view.match_clients %}
+    {{ clients }};
+{% endfor %}
+  };
+
+{% for zone in view.zones %}
+  zone "{{ zone.origin }}" {
+
+    # Hosts which are allowed to issue queries to the server. If not specified all
+    # hosts are allowed to make queries (defaults to allow-query {any;};
+    #
+    # NOTE:
+    # - The statements may be used in a zone, view or a global options
+    #   clause.
+{% if zone.allow_query is defined and zone.allow_query | length > 0 %}
+    allow-query {
+{% for entry in zone.allow_query %}
+      {{ entry }};
+{% endfor %}
+    };
+{% else %}
+    # allow-query {};
+{% endif %}
+
+    # allow-query-on defines the server interface(s) from which queries
+    # are accepted and can be useful where a server is multi-homed,
+    # perhaps in conjunction with a view clause. Defaults to
+    # allow-query-on {any;};) meaning that queries are accepted on any
+    # server interface.
+    #
+    # NOTE:
+    # - The statements may be used in a zone, view or a global options
+    #   clause.
+{% if zone.allow_query_on is defined and zone.allow_query_on | length > 0 %}
+    allow-query {
+{% for entry in zone.allow_query_on %}
+      {{ entry }};
+{% endfor %}
+    };
+{% else %}
+    # allow-query-on {};
+{% endif %}
+
+    # allow-transfer defines a match list e.g. IP address(es) that are
+    # allowed to transfer (copy) the zone information from the server
+    # (master or slave for the zone). The default behavior is to allow
+    # zone transfers to any host. While on its face this may seem an
+    # excessively friendly default, DNS data is essentially public (that's
+    # why its there) and the bad guys can get all of it anyway. However if
+    # the thought of anyone being able to transfer your precious zone file
+    # is repugnant, or (and this is far more significant) you are
+    # concerned about possible DoS attack initiated by XFER requests, then
+    # use the following policy.
+    #
+    # NOTE:
+    # - This statement may be used in a zone, view or global options clause.
+{% if zone.allow_transfer is defined and zone.allow_transfer | length > 0 %}
+    allow-transfer {
+{% for entry in zone.allow_transfer %}
+      key {{ entry }};
+{% endfor %}
+    };
+{% else %}
+    # allow-transfer {};
+{% endif %}
+
+    # allow-update defines an address_match_list of hosts that are allowed
+    # to submit dynamic updates for master zones, and thus this statement
+    # enables Dynamic DNS. The default in BIND 9 is to disallow updates
+    # from all hosts, that is, DDNS is disabled by default. This statement
+    # is mutually exclusive with update-policy and applies to master zones
+    # only. The example shows DDNS for three zones: the first disables
+    # DDNS explicitly, the second uses an IP-based list, and the third
+    # references a key clause. The allow-update in the first zone clause
+    # could have been omitted since it is the default behavior. Many
+    # people like to be cautious in case the default mode changes.
+    #
+    # NOTE:
+    # - This statement may be used in a zone, view or an options clause.
+{% if zone.allow_update is defined and zone.allow_update | length > 0 %}
+    allow-update {
+{% for entry in zone.allow_update %}
+      key {{ entry }};
+{% endfor %}
+    };
+{% else %}
+    # allow-update {};
+{% endif %}
+
+    # allow-update-forwarding defines a match list, for instance,
+    # IP address(es) that are allowed to submit dynamic updates to
+    # a 'slave' sever for onward transmission to a 'master'.
+    #
+    # NOTE:
+    # - This statement may be used in zone, view or an options clause.
+{% if zone.allow_update_forwarding is defined and zone.allow_update_forwarding | length > 0 %}
+    allow-update-forwarding {
+{% for entry in zone.allow_update_forwarding %}
+      {{ entry }};
+{% endfor %}
+    };
+{% else %}
+    # allow-update-forwarding {};
+{% endif %}
+
+    # Defines the file used by the zone in quoted string format, for
+    # instance, "slave/example.com" - or whatever convention you use. The
+    # file entry is mandatory for master and hint and optional - but
+    # highly recommended - for slave and not required for forward zones.
+    # The file may be an absolute path or relative to directory.
+    #
+    # NOTE:
+    # - If a type Slave has a file statement then any zone transfer
+    #   will cause it to update this file. If the slave is reloaded then
+    #   it will read this file and immediately start answering queries for
+    #   the domain. If no file is specified it will immediately try to
+    #   contact the Master and initiate a zone transfer. For obvious
+    #   reasons the Slave cannot to zone queries until this zone transfer
+    #   is complete. If the Master is not available or the Slave fails to
+    #   contact the Master, ffor whatever reason, the zone may be left with
+    #   no effective Authoritative Name Servers.
+    file "/etc/named/{{ zone.file }}";
+
+    # master servers
+    # https://bind9.readthedocs.io/en/latest/manpages.html?highlight=masters#masters
+{% if zone.masters is defined and zone.masters | length > 0 %}
+    masters {
+{% for master in zone.masters %}
+      {{ master.ip }} key {{ master.tsigkey}};
+{% endfor %}
+    };
+{% else %}
+    # masters {};
+{% endif %}
+
+    # notify behavior is applicable to both master zones (with
+    # 'type master;') and slave zones (with 'type slave;') and if
+    # set to 'yes' (the default) then, when a zone is loaded or
+    # changed, for example, after a zone transfer, NOTIFY messages
+    # are sent to the name servers defined in the NS records for
+    # the zone (except itself and the 'Primary Master' name server
+    # defined in the SOA record) and to any IPs listed in any
+    # also-notify statement.
+    #
+    # If set to 'no' NOTIFY messages are not sent.
+    # If set to 'explicit' NOTIFY is only sent to those IP(s) listed
+    # in an also-notify statement.
+    #
+    # NOTE:
+    # - This statement may be specified in zone, view clauses or in a
+    #   global options clause.
+    notify yes;
+
+    # Zones configured for dynamic DNS may use this option to set the
+    # update method to be used for the zone serial number in the SOA
+    # record.
+    #
+    # With the default setting of serial-update-method increment;, the
+    # SOA serial number is incremented by one each time the zone is
+    # updated.
+    #
+    # When set to serial-update-method unixtime;, the SOA serial number
+    # is set to the number of seconds since the Unix epoch, unless the
+    # serial number is already greater than or equal to that value, in
+    # which case it is simply incremented by one.
+    #
+    # When set to serial-update-method date;, the new SOA serial number
+    # is the current date in the form “YYYYMMDD”, followed by two
+    # zeroes, unless the existing serial number is already greater than
+    # or equal to that value, in which case it is incremented by one.
+{% if zone.serial_update_method is defined %}
+    serial-update-method {{ zone.serial_update_method }};
+{% else %}
+    # serial-update-method [date | increment | unixtime ];
+{% endif %}
+
+    type {{ zone.type }};
+
+  };
+{% endfor %}
+
+};
+{% endfor %}

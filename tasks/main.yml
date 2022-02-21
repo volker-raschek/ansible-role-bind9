@@ -1,0 +1,70 @@
+---
+
+- name: include special distribution-dependent variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: install bind and dependencies
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ bind_package_names }}"
+
+- name: create logging directory
+  file:
+    path: "{{ bind_log_directory }}"
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: 0755
+    state: directory
+    recurse: yes
+
+- name: remove existing journal files
+  block:
+  - name: find existing journal files
+    find:
+      path: "{{ bind_config_directory }}"
+      recurse: yes
+      patterns: "*.jnl"
+    register: files_to_delete
+  - name: delete existing journal files
+    file:
+      path: "{{ item.path }}"
+      state: absent
+    with_items: "{{ files_to_delete.files }}"
+
+
+#  - name: copy zone files
+#   include_tasks: copy_zone_files.yml
+#   with_items:
+#   - "{{ bind9_views }}"
+#   loop_control:
+#     loop_var: view
+
+- name: template zone files
+  include_tasks: template_zone_files.yml
+  with_items:
+  - "{{ bind9_views }}"
+  loop_control:
+    loop_var: view
+
+- name: set up global bind config
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/{{ item }}"
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: 0644
+  with_items:
+  - named.conf
+  - named/named.conf.acl
+  - named/named.conf.logging
+  - named/named.conf.options
+  - named/named.conf.tsigkeys
+  - named/named.conf.views
+  notify: restart named
+
+- name: start and enabled named
+  systemd:
+    name: named
+    state: started
+    enabled: yes

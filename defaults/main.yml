@@ -1,0 +1,93 @@
+---
+
+bind9_acls:
+- name: internalnets
+  permissions: []
+  # - "111.222.111.222"
+
+bind9_logging:
+  categories:
+  - name: "security"
+    channels:
+    - "security_file"
+  channels:
+  - name: "security_file"
+    file:
+      path: "/var/log/named/security.log"
+      options: "versions 3 size 30m"
+    severity: "dynamic"
+    print_times: "yes"
+
+bind9_options:
+  allow_query: []
+  allow_query_on: []
+  allow_query_cache: []
+  allow_query_cache_on: []
+  allow_recursion:
+  - "localhost"
+  - "localnets"
+  - "internalnets"
+  allow_recursion_on: []
+  allow_transfer: []
+  allow_update: []
+  allow_update_forwarding: []
+  auth_nxdomain: false
+  blackhole: []
+  dnssec_validations: true
+  forwarders:
+  - "8.8.8.8"               # Google IPv4
+  - "8.8.4.4"               # Google IPv4
+  - "2001:4860:4860::8888"  # Google IPv6
+  - "2001:4860:4860::8844"  # Google IPv6
+  - "208.67.222.222"        # OpenDNS IPv4
+  - "208.67.220.220"        # OpenDNS IPv4
+  - "2620:0:ccc::2"         # OpenDNS IPv6
+  - "2620:0:ccd::2"         # OpenDNS IPv6
+  interface_interval: 0
+  listen_on_ipv4:
+  - "127.0.0.1"
+  listen_on_ipv6:
+  - "::1"
+  max_transfer_time: "60"
+  minimal_responses: "no"
+  notify: "yes"
+  recursion: "yes"
+  transfer_format: "many-answers"
+
+bind9_tsigkeys: []
+# - name: "name"
+#   algorithm: "algorithm"
+#   secret: "secret"
+
+bind9_views: []
+# - name: external
+#   match_clients:
+#   - "!internalnets"
+#   - "any"
+#   zones:
+#   - allow_notify: []
+#     allow_query:
+#     - "any"
+#     allow_query_on: []
+#     allow_update: []
+#     allow_update_forwarding: []
+#     allow_transfer: []
+#     file: zones/external/db.local.example
+#     origin: "example.local."
+#     type: master
+# - name: internal
+#   match_clients:
+#   - "!192.168.178.1"
+#   - "internalnets"
+#   - "127.0.0.0/8"
+#   zones:
+#   - allow_notify: []
+#     allow_query:
+#     - "any"
+#     allow_query_on: []
+#     allow_update: []
+#     allow_update_forwarding: []
+#     allow_transfer: []
+#     file: zones/internal/db.local.example
+#     origin: "example.local."
+#     type: master

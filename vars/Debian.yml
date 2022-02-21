@@ -1,0 +1,13 @@
+---
+
+bind_main_config: /etc/named.conf
+bind_config_directory: /etc/named
+bind_log_directory: /var/log/named
+
+bind_package_names:
+- bind9
+
+bind_service_name: named
+
+bind_unix_user: bind
+bind_unix_group: bind

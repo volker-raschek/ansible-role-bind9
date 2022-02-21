@@ -1,0 +1,12 @@
+#
+# {{ ansible_managed }}
+#
+
+{% for acl in bind9_acls %}
+acl "{{ acl.name }}" {
+{% for permission in acl.permissions %}
+  {{ permission }};
+{% endfor %}
+};
+
+{% endfor %}
