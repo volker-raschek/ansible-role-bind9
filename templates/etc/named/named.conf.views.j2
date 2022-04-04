@@ -127,7 +127,7 @@ view "{{ view.name }}" {
     #   is complete. If the Master is not available or the Slave fails to
     #   contact the Master, ffor whatever reason, the zone may be left with
     #   no effective Authoritative Name Servers.
-    file "/etc/named/{{ zone.file }}";
+    file "{{ bind_config_directory }}/{{ zone.file }}";
 
     # master servers
     # https://bind9.readthedocs.io/en/latest/manpages.html?highlight=masters#masters

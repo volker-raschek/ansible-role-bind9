@@ -1,8 +1,8 @@
 ---
 
-bind_main_config: /etc/named.conf
-bind_config_directory: /etc/named
-bind_log_directory: /var/log/named
+bind_main_config: /etc/bind/named.conf
+bind_config_directory: /etc/bind
+bind_log_directory: /var/log/bind
 
 bind_package_names:
 - bind9

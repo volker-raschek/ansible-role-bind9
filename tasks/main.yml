@@ -1,15 +1,15 @@
 ---
 
-- name: include special distribution-dependent variables
+- name: Include special distribution-dependent variables
   include_vars: "{{ ansible_os_family }}.yml"
 
-- name: install bind and dependencies
+- name: Install bind and dependencies
   package:
     name: "{{ item }}"
     state: present
   with_items: "{{ bind_package_names }}"
 
-- name: create logging directory
+- name: Create logging directory
   file:
     path: "{{ bind_log_directory }}"
     owner: "{{ bind_unix_user }}"
@@ -18,7 +18,16 @@
     state: directory
     recurse: yes
 
-- name: remove existing journal files
+- name: Create config directory
+  file:
+    path: "{{ bind_config_directory }}"
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: 0755
+    state: directory
+    recurse: yes
+
+- name: Remove existing journal files
   block:
   - name: find existing journal files
     find:
@@ -40,30 +49,39 @@
 #   loop_control:
 #     loop_var: view
 
-- name: template zone files
+- name: Create DNS-Zone files
   include_tasks: template_zone_files.yml
   with_items:
   - "{{ bind9_views }}"
   loop_control:
     loop_var: view
 
-- name: set up global bind config
+- name: Create main configuration file
+  template:
+    src: "etc/named.conf.j2"
+    dest: "{{ bind_main_config }}"
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: 0644
+  notify: restart named
+
+- name: Create excluded configuration files
   template:
     src: "{{ item }}.j2"
-    dest: "/etc/{{ item }}"
+    dest: "{{ item | replace('etc/named', bind_config_directory) }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
     mode: 0644
   with_items:
-  - named.conf
-  - named/named.conf.acl
-  - named/named.conf.logging
-  - named/named.conf.options
-  - named/named.conf.tsigkeys
-  - named/named.conf.views
+  - etc/named.conf
+  - etc/named/named.conf.acl
+  - etc/named/named.conf.logging
+  - etc/named/named.conf.options
+  - etc/named/named.conf.tsigkeys
+  - etc/named/named.conf.views
   notify: restart named
 
-- name: start and enabled named
+- name: Start and enabled named
   systemd:
     name: named
     state: started

@@ -167,7 +167,7 @@ options {
   # allow-update-forwarding {};
 {% endif %}
 
-  directory "/etc/named";
+  directory "{{ bind_config_directory }}";
 
   dnssec-validation {{ bind9_options.dnssec_validation | default('no') }};
 

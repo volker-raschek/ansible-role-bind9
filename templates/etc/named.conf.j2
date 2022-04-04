@@ -1,0 +1,14 @@
+#
+# {{ ansible_managed }}
+#
+
+# zone "." IN {
+#   type hint;
+#   file "named.ca";
+# };
+
+include "{{ bind_config_directory }}/named.conf.acl";
+include "{{ bind_config_directory }}/named.conf.logging";
+include "{{ bind_config_directory }}/named.conf.options";
+include "{{ bind_config_directory }}/named.conf.tsigkeys";
+include "{{ bind_config_directory }}/named.conf.views";
