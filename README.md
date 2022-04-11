@@ -8,7 +8,7 @@ With following role can be bind installed and configured.
 ## Installation
 
 ```bash
-ansible-galaxy install volker_raschek.bind9_role
+ansible-galaxy install volker_raschek.bind9
 ```
 
 ## Supported distributions
