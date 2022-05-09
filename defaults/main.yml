@@ -75,6 +75,7 @@ bind9_views: []
 #     file: zones/external/db.local.example
 #     origin: "example.local."
 #     type: master
+#     notify: yes
 # - name: internal
 #   match_clients:
 #   - "!192.168.178.1"

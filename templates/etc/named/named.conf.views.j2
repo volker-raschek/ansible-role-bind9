@@ -129,6 +129,32 @@ view "{{ view.name }}" {
     #   no effective Authoritative Name Servers.
     file "{{ bind_config_directory }}/{{ zone.file }}";
 
+    # This option is only meaningful if the forwarders list is not empty. A
+    # value of first is the default and causes the server to query the
+    # forwarders first; if that does not answer the question, the server then
+    # looks for the answer itself. If only is specified, the server only queries
+    # the forwarders.
+{% if zone.forward is defined and zone.forward | length > 0 %}
+    forward {{ zone.forward }};
+{% else %}
+    # forward first;
+{% endif %}
+
+    # This specifies a list of IP addresses to which queries are forwarded. The
+    # default is the empty list (no forwarding). Each address in the list can be
+    # associated with an optional port number and/or DSCP value, and a default
+    # port number and DSCP value can be set for the entire list.
+    # https://bind9.readthedocs.io/en/latest/reference.html#forwarding
+{% if zone.forwarders is defined and zone.forwarders | length > 0 %}
+  forwarders {
+{% for forwarder in zone.forwarders %}
+    {{ forwarder }};
+{% endfor %}
+  };
+{% else %}
+    # forwarders {};
+{% endif %}
+
     # master servers
     # https://bind9.readthedocs.io/en/latest/manpages.html?highlight=masters#masters
 {% if zone.masters is defined and zone.masters | length > 0 %}
@@ -157,7 +183,7 @@ view "{{ view.name }}" {
     # NOTE:
     # - This statement may be specified in zone, view clauses or in a
     #   global options clause.
-    notify yes;
+    notify {{ 'yes' if zone.notify else 'no' }};
 
     # Zones configured for dynamic DNS may use this option to set the
     # update method to be used for the zone serial number in the SOA
