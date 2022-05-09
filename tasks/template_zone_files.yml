@@ -11,6 +11,7 @@
   - "{{ view.zones }}"
   loop_control:
     loop_var: zone
+  when: zone.file is defined and zone.file | length > 0
 
 - name: "template view {{ view.name }}"
   template:

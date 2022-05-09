@@ -1,3 +1,4 @@
+#jinja2: lstrip_blocks: "True (or False)", trim_blocks: "True (or False)"
 #
 # {{ ansible_managed }}
 #
@@ -127,7 +128,13 @@ view "{{ view.name }}" {
     #   is complete. If the Master is not available or the Slave fails to
     #   contact the Master, ffor whatever reason, the zone may be left with
     #   no effective Authoritative Name Servers.
+{% if zone.file is defined and zone.file | length > 0 and not zone.file.startswith('/') %}
     file "{{ bind_config_directory }}/{{ zone.file }}";
+{% elif zone.file is defined and zone.file | length > 0 and zone.file.startswith('/')%}
+    file "{{ zone.file }}";
+{% else %}
+    # file "{{ bind_config_directory }}/...";
+{% endif %}
 
     # This option is only meaningful if the forwarders list is not empty. A
     # value of first is the default and causes the server to query the
@@ -146,11 +153,11 @@ view "{{ view.name }}" {
     # port number and DSCP value can be set for the entire list.
     # https://bind9.readthedocs.io/en/latest/reference.html#forwarding
 {% if zone.forwarders is defined and zone.forwarders | length > 0 %}
-  forwarders {
+    forwarders {
 {% for forwarder in zone.forwarders %}
-    {{ forwarder }};
+      {{ forwarder }};
 {% endfor %}
-  };
+    };
 {% else %}
     # forwarders {};
 {% endif %}
@@ -183,7 +190,14 @@ view "{{ view.name }}" {
     # NOTE:
     # - This statement may be specified in zone, view clauses or in a
     #   global options clause.
-    notify {{ 'yes' if zone.notify else 'no' }};
+{% if zone.notify is defined and zone.notify %}
+    notify yes;
+{% elif zone.notify is defined and not zone.notify %}
+    notify no;
+{% else %}
+    # notify yes | no;
+{% endif %}
+
 
     # Zones configured for dynamic DNS may use this option to set the
     # update method to be used for the zone serial number in the SOA
@@ -211,6 +225,7 @@ view "{{ view.name }}" {
     type {{ zone.type }};
 
   };
+
 {% endfor %}
 
 };
