@@ -92,3 +92,14 @@ bind9_views: []
 #     file: zones/internal/db.local.example
 #     origin: "example.local."
 #     type: master
+#   - allow_notify: []
+#     allow_query: []
+#     allow_query_on: []
+#     allow_update: []
+#     allow_update_forwarding: []
+#     allow_transfer: []
+#     forward: only
+#     forwarders:
+#     - 192.168.175.1
+#     origin: "glr.external.local."
+#     type: forward
