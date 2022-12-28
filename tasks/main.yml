@@ -1,6 +1,6 @@
 ---
 
-- name: Include special distribution-dependent variables
+- name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Install bind and dependencies
