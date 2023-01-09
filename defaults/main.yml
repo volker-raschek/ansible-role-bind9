@@ -35,14 +35,22 @@ bind9_options:
   blackhole: []
   dnssec_validations: true
   forwarders:
-  - "8.8.8.8"               # Google IPv4
-  - "8.8.4.4"               # Google IPv4
-  - "2001:4860:4860::8888"  # Google IPv6
-  - "2001:4860:4860::8844"  # Google IPv6
-  - "208.67.222.222"        # OpenDNS IPv4
-  - "208.67.220.220"        # OpenDNS IPv4
-  - "2620:0:ccc::2"         # OpenDNS IPv6
-  - "2620:0:ccd::2"         # OpenDNS IPv6
+  - ip: "8.8.8.8"               # Google IPv4
+    port: "53"
+  - ip: "8.8.4.4"               # Google IPv4
+    port: "53"
+  - ip: "2001:4860:4860::8888"  # Google IPv6
+    port: "53"
+  - ip: "2001:4860:4860::8844"  # Google IPv6
+    port: "53"
+  - ip: "208.67.222.222"        # OpenDNS IPv4
+    port: "53"
+  - ip: "208.67.220.220"        # OpenDNS IPv4
+    port: "53"
+  - ip: "2620:0:ccc::2"         # OpenDNS IPv6
+    port: "53"
+  - ip: "2620:0:ccd::2"         # OpenDNS IPv6
+    port: "53"
   interface_interval: 0
   listen_on_ipv4:
   - "127.0.0.1"

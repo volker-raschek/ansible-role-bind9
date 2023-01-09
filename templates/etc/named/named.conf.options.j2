@@ -176,7 +176,11 @@ options {
 {% if bind9_options.forwarders is defined and bind9_options.forwarders | length > 0 %}
   forwarders {
 {% for forwarder in bind9_options.forwarders %}
-    {{ forwarder }};
+{% if forwarder.port is defined and forwarder.port | length > 0 %}
+    {{ forwarder.ip }} port {{ forwarder.port }};
+{% else %}
+    {{ forwarder.ip }};
+{% endif %}
 {% endfor %}
   };
 {% else %}
