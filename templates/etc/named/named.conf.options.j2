@@ -169,7 +169,7 @@ options {
 
   directory "{{ bind_config_directory }}";
 
-  dnssec-validation {{ bind9_options.dnssec_validation | default('no') }};
+  dnssec-validation {{ 'yes' if bind9_options.dnssec_validation else 'no' }};
 
   # dump-file "/var/bind/named.dump";
 
