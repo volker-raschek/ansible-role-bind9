@@ -224,6 +224,22 @@ view "{{ view.name }}" {
 
     type {{ zone.type }};
 
+    # The update-policy clause allows more fine-grained control over which
+    # updates are allowed. It specifies a set of rules, in which each rule
+    # either grants or denies permission for one or more names in the zone to be
+    # updated by one or more identities. Identity is determined by the key that
+    # signed the update request, using either TSIG or SIG(0).
+    # https://bind9.readthedocs.io/en/v9_16_5/reference.html#dynamic-update-policies
+{% if zone.update_policies is defined and zone.update_policies | length > 0 %}
+    update-policy {
+{% for update_policy in zone.update_policies %}
+      {{ update_policy.action }} {{ update_policy.identity }} {{ update_policy.ruletype }} {{ update_policy.name | default('') }} {{ update_policy.types | default('') | join(' ') }};
+{% endfor %}
+    };
+{% else %}
+    # update-policy {};
+{% endif %}
+
   };
 
 {% endfor %}

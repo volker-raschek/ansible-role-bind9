@@ -33,7 +33,7 @@ bind9_options:
   allow_update_forwarding: []
   auth_nxdomain: false
   blackhole: []
-  dnssec_validations: true
+  dnssec_validation: true
   forwarders:
   - ip: "8.8.8.8"               # Google IPv4
     port: "53"
@@ -60,6 +60,14 @@ bind9_options:
   minimal_responses: "no"
   notify: "yes"
   recursion: "yes"
+  update_policies: []
+  # - action: grant
+  #   identity: keyname
+  #   ruletype: name
+  #   name: _acme-challenge.example.com.
+  #   types:
+  #   - TXT
+
   transfer_format: "many-answers"
 
 bind9_tsigkeys: []
