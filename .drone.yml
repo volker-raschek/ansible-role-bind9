@@ -21,6 +21,7 @@ steps:
   commands:
   - ansible-lint .
   image: docker.io/volkerraschek/ansible-archlinux:latest
+  pull: always
   resources:
     limits:
       cpu: 250
