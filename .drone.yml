@@ -3,8 +3,9 @@ kind: pipeline
 type: kubernetes
 name: linter
 
-platform:
-  os: linux
+node_selector:
+  kubernetes.io/arch: amd64
+  kubernetes.io/os: linux
 
 steps:
 - name: markdown lint
@@ -18,12 +19,12 @@ steps:
 
 - name: ansible lint
   commands:
-  - ansible-lint
-  image: docker.io/volkerraschek:ansible-archlinux:latest
+  - ansible-lint .
+  image: docker.io/volkerraschek/ansible-archlinux:latest
   resources:
     limits:
-      cpu: 50
-      memory: 50M
+      cpu: 250
+      memory: 250M
 
 - name: email-notification
   environment:
