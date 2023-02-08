@@ -16,6 +16,15 @@ steps:
       cpu: 50
       memory: 50M
 
+- name: ansible lint
+  commands:
+  - ansible-lint
+  image: docker.io/volkerraschek:ansible-archlinux:latest
+  resources:
+    limits:
+      cpu: 50
+      memory: 50M
+
 - name: email-notification
   environment:
     PLUGIN_HOST:
