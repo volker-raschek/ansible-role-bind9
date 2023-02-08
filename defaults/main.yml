@@ -12,7 +12,7 @@ bind9_logging:
     - "security_file"
   channels:
   - name: "security_file"
-    file:
+    ansible.builtin.file:
       path: "/var/log/named/security.log"
       options: "versions 3 size 30m"
     severity: "dynamic"
@@ -91,7 +91,7 @@ bind9_views: []
 #     file: zones/external/db.local.example
 #     origin: "example.local."
 #     type: master
-#     notify: yes
+#     notify: true
 # - name: internal
 #   match_clients:
 #   - "!192.168.178.1"

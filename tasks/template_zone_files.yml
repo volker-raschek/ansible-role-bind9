@@ -1,7 +1,7 @@
 ---
 
 - name: create directory for zone {{ zone.file | dirname }}
-  file:
+  ansible.builtin.file:
     path: "{{ bind_config_directory }}/{{ zone.file | dirname }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
@@ -14,7 +14,7 @@
   when: zone.file is defined and zone.file | length > 0
 
 - name: "template view {{ view.name }}"
-  template:
+  ansible.builtin.template:
     src: "{{ inventory_hostname }}/etc/named/{{ zone.file }}.j2"
     dest: "{{ bind_config_directory }}/{{ zone.file }}"
     owner: "{{ bind_unix_user }}"

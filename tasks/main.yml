@@ -4,39 +4,39 @@
   include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Install bind and dependencies
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: present
   with_items: "{{ bind_package_names }}"
 
 - name: Create logging directory
-  file:
+  ansible.builtin.file:
     path: "{{ bind_log_directory }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
     mode: 0755
     state: directory
-    recurse: yes
+    recurse: true
 
 - name: Create config directory
-  file:
+  ansible.builtin.file:
     path: "{{ bind_config_directory }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
     mode: 0755
     state: directory
-    recurse: yes
+    recurse: true
 
 - name: Remove existing journal files
   block:
   - name: find existing journal files
     find:
       path: "{{ bind_config_directory }}"
-      recurse: yes
+      recurse: true
       patterns: "*.jnl"
     register: files_to_delete
   - name: delete existing journal files
-    file:
+    ansible.builtin.file:
       path: "{{ item.path }}"
       state: absent
     with_items: "{{ files_to_delete.files }}"
@@ -57,7 +57,7 @@
     loop_var: view
 
 - name: Create main configuration file
-  template:
+  ansible.builtin.template:
     src: "etc/named.conf.j2"
     dest: "{{ bind_main_config }}"
     owner: "{{ bind_unix_user }}"
@@ -66,7 +66,7 @@
   notify: restart named
 
 - name: Create excluded configuration files
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ item | replace('etc/named', bind_config_directory) }}"
     owner: "{{ bind_unix_user }}"
@@ -82,7 +82,7 @@
   notify: restart named
 
 - name: Start and enabled named
-  systemd:
+  ansible.builtin.systemd:
     name: named
     state: started
-    enabled: yes
+    enabled: true
