@@ -1,6 +1,6 @@
 ---
 
-- name: restart named
+- name: Restart named
   ansible.builtin.systemd:
     name: "{{ bind_service_name }}"
     state: restarted

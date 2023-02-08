@@ -1,7 +1,7 @@
 ---
 
 - name: Include OS-specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Install bind and dependencies
   ansible.builtin.package:
@@ -29,13 +29,13 @@
 
 - name: Remove existing journal files
   block:
-  - name: find existing journal files
-    find:
+  - name: Find existing journal files
+    ansible.builtin.find:
       path: "{{ bind_config_directory }}"
       recurse: true
       patterns: "*.jnl"
     register: files_to_delete
-  - name: delete existing journal files
+  - name: Delete existing journal files
     ansible.builtin.file:
       path: "{{ item.path }}"
       state: absent
@@ -50,7 +50,7 @@
 #     loop_var: view
 
 - name: Create DNS-Zone files
-  include_tasks: template_zone_files.yml
+  ansible.builtin.include_tasks: template_zone_files.yml
   with_items:
   - "{{ bind9_views }}"
   loop_control:
