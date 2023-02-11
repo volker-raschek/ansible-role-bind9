@@ -12,7 +12,7 @@ bind9_logging:
     - "security_file"
   channels:
   - name: "security_file"
-    ansible.builtin.file:
+    file:
       path: "/var/log/named/security.log"
       options: "versions 3 size 30m"
     severity: "dynamic"

@@ -63,7 +63,7 @@
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
     mode: 0644
-  notify: restart named
+  notify: Restart named
 
 - name: Create excluded configuration files
   ansible.builtin.template:
@@ -79,7 +79,7 @@
   - etc/named/named.conf.options
   - etc/named/named.conf.tsigkeys
   - etc/named/named.conf.views
-  notify: restart named
+  notify: Restart named
 
 - name: Start and enabled named
   ansible.builtin.systemd:
