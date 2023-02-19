@@ -70,6 +70,15 @@ bind9_options:
 
   transfer_format: "many-answers"
 
+bind9_statics:
+  enabled: true
+  channels:
+  - inet: "127.0.0.1"
+    port: "8053"
+    acls:
+    - "localhost"
+
+
 bind9_tsigkeys: []
 # - name: "name"
 #   algorithm: "algorithm"
