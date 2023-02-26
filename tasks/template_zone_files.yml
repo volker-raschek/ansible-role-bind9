@@ -5,7 +5,7 @@
     path: "{{ bind_config_directory }}/{{ zone.file | dirname }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
-    mode: 0755
+    mode: "0755"
     state: directory
   with_items:
   - "{{ view.zones }}"
@@ -19,7 +19,7 @@
     dest: "{{ bind_config_directory }}/{{ zone.file }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
-    mode: 0644
+    mode: "0644"
   with_items:
   - "{{ view.zones }}"
   loop_control:

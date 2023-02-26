@@ -14,7 +14,7 @@
     path: "{{ bind_log_directory }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
-    mode: 0755
+    mode: "0755"
     state: directory
     recurse: true
 
@@ -23,7 +23,7 @@
     path: "{{ bind_config_directory }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
-    mode: 0755
+    mode: "0755"
     state: directory
     recurse: true
 
@@ -62,7 +62,7 @@
     dest: "{{ bind_main_config }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
-    mode: 0644
+    mode: "0644"
   notify: Restart named
 
 - name: Create excluded configuration files
@@ -71,7 +71,7 @@
     dest: "{{ item | replace('etc/named', bind_config_directory) }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
-    mode: 0644
+    mode: "0644"
   with_items:
   - etc/named.conf
   - etc/named/named.conf.acl
