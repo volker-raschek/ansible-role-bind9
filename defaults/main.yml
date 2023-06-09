@@ -5,6 +5,14 @@ bind9_acls:
   permissions: []
   # - "111.222.111.222"
 
+bind9_controls: []
+# - acls:
+#   - localhost
+#   inet: "127.0.0.1"
+#   port: "953"
+#   tsig_keys:
+#   - rndc
+
 bind9_logging:
   categories:
   - name: "security"
@@ -69,6 +77,11 @@ bind9_options:
   #   - TXT
 
   transfer_format: "many-answers"
+
+bind9_rndc_key:
+  name: ""
+  algorithm: ""
+  secret: ""
 
 bind9_statics:
   enabled: true

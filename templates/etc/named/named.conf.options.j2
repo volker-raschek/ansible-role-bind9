@@ -2,6 +2,23 @@
 # {{ ansible_managed }}
 #
 
+{% if bind9_controls is defined and bind9_controls | length > 0 %}
+controls {
+{% for control in bind9_controls %}
+  inet {{ control.inet }} port {{ control.port }} allow {
+{% for acl in control.acls %}
+    {{ acl }};
+{% endfor %}
+  } keys {
+{% for name in control.tsig_keys %}
+    "{{ name }}";
+{% endfor %}
+  };
+
+{% endfor %}
+};
+{% endif %}
+
 options {
 
   # This specifies which hosts are allowed to ask ordinary DNS questions.

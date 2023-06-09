@@ -41,14 +41,6 @@
       state: absent
     with_items: "{{ files_to_delete.files }}"
 
-
-#  - name: copy zone files
-#   ansible.builtin.include_tasks: copy_zone_files.yml
-#   with_items:
-#   - "{{ bind9_views }}"
-#   loop_control:
-#     loop_var: view
-
 - name: Create DNS-Zone files
   ansible.builtin.include_tasks: template_zone_files.yml
   with_items:
@@ -86,3 +78,14 @@
     name: named
     state: started
     enabled: true
+
+- name: Create rndc.key
+  ansible.builtin.template:
+    src: etc/rndc.key.j2
+    dest: /etc/rndc.key
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: "0600"
+  when: bind9_rndc_key.name | length > 0 and
+        bind9_rndc_key.algorithm | length > 0 and
+        bind9_rndc_key.secret | length > 0
