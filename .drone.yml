@@ -37,7 +37,7 @@ steps:
       from_secret: smtp_password
     PLUGIN_FROM:
       from_secret: smtp_mail_address
-  image: docker.io/drillster/drone-email:latest
+  image: git.cryptic.systems/volker.raschek/drone-email:0.1.4
   resources:
     limits:
       cpu: 50
