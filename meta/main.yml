@@ -1,6 +1,5 @@
 galaxy_info:
   role_name: bind9
-  namespace: volker_raschek
   author: Markus Pesch
   description: Role to install and configure bind9 on different distributions
   company: Cryptic Systems
