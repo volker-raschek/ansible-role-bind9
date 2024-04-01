@@ -139,5 +139,5 @@ bind9_views: []
 #     forward: only
 #     forwarders:
 #     - 192.168.175.1
-#     origin: "glr.external.local."
+#     origin: "gitlab-runner.external.local."
 #     type: forward
