@@ -16,7 +16,7 @@
 - name: "Template view {{ view.name }}"
   ansible.builtin.template:
     src: "{{ inventory_hostname }}/etc/named/{{ zone.file }}.j2"
-    dest: "{{ bind_config_directory }}/{{ zone.file }}"
+    dest: "{{ bind_config_directory + '/' + zone.file }}"
     owner: "{{ bind_unix_user }}"
     group: "{{ bind_unix_group }}"
     mode: "0644"
@@ -26,3 +26,11 @@
     loop_var: zone
   when: zone.type == 'master'
   notify: Restart named
+
+- name: Check if last character in zone files is a newline
+  ansible.builtin.include_tasks: verify_zone_file.yml
+  with_items:
+  - "{{ view.zones }}"
+  loop_control:
+    loop_var: zone
+  when: zone.type == 'master'
