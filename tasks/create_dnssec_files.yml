@@ -1,0 +1,25 @@
+---
+
+- name: "Create private DNSSEC: {{ bind9_dnssec_key.origin }}"
+  ansible.builtin.copy:
+    dest: "{{ item.private.filename }}"
+    content: "{{ item.private.content }}"
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: "0600"
+  no_log: true
+  with_items:
+  - "{{ bind9_dnssec_key.key_signing_key }}"
+  - "{{ bind9_dnssec_key.zone_signing_key }}"
+
+- name: "Create public DNSSEC: {{ bind9_dnssec_key.origin }}"
+  ansible.builtin.copy:
+    dest: "{{ item.public.filename }}"
+    content: "{{ item.public.content }}"
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: "0644"
+  no_log: true
+  with_items:
+  - "{{ bind9_dnssec_key.key_signing_key }}"
+  - "{{ bind9_dnssec_key.zone_signing_key }}"

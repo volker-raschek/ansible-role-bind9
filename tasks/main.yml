@@ -41,6 +41,47 @@
       state: absent
     with_items: "{{ files_to_delete.files }}"
 
+- name: Remove existing signed zone files
+  block:
+  - name: Find existing signed zone files
+    ansible.builtin.find:
+      path: "{{ bind_config_directory }}"
+      recurse: true
+      patterns: "*.signed"
+    register: files_to_delete
+  - name: Delete existing signed zone files
+    ansible.builtin.file:
+      path: "{{ item.path }}"
+      state: absent
+    with_items: "{{ files_to_delete.files }}"
+
+- name: Remove existing DNSSEC key directory
+  block:
+  - name: Check if DNSSEC key directory exists
+    ansible.builtin.stat:
+      path: "{{ bind9_options.key_directory }}"
+    register: _stat_bind9_options_key_directory
+  - name: Remove DNSSEC key directory
+    ansible.builtin.file:
+      path: "{{ bind9_options.key_directory }}"
+      state: "absent"
+    when: _stat_bind9_options_key_directory.stat.exists
+
+- name: Create DNSSEC key directory
+  ansible.builtin.file:
+    path: "{{ bind9_options.key_directory }}"
+    owner: "{{ bind_unix_user }}"
+    group: "{{ bind_unix_group }}"
+    mode: "0700"
+    state: directory
+
+- name: Create DNSSEC files
+  ansible.builtin.include_tasks: create_dnssec_files.yml
+  with_items: "{{ bind9_dnssec_keys }}"
+  no_log: true
+  loop_control:
+    loop_var: bind9_dnssec_key
+
 - name: Create DNS-Zone files
   ansible.builtin.include_tasks: template_zone_files.yml
   with_items:

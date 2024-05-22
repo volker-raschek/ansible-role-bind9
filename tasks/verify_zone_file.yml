@@ -1,6 +1,6 @@
 ---
 
-- name: "Read the last character of DNS Zonefile: {{ bind_config_directory + '/' + zone.file }}"
+- name: "Read the last character of DNS zone: {{ zone.config.origin }}"
   ansible.builtin.command:
     cmd: "tail --bytes 1 {{ bind_config_directory + '/' + zone.file }}"
   register: _bind9_zone_last_character

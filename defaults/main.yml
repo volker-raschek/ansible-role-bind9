@@ -41,7 +41,8 @@ bind9_options:
   allow_update_forwarding: []
   auth_nxdomain: false
   blackhole: []
-  dnssec_validation: true
+  dnssec_accept_expired: false
+  dnssec_validation: "auto"
   forwarders:
   - ip: "8.8.8.8"               # Google IPv4
     port: "53"
@@ -60,6 +61,7 @@ bind9_options:
   - ip: "2620:0:ccd::2"         # OpenDNS IPv6
     port: "53"
   interface_interval: 0
+  key_directory: "/var/named/dnssec-keys"
   listen_on_ipv4:
   - "127.0.0.1"
   listen_on_ipv6:
@@ -83,6 +85,23 @@ bind9_rndc_key:
   algorithm: ""
   secret: ""
 
+bind9_dnssec_keys: []
+# - origin: "hellenthal.cryptic.systems"
+#   key_signing_key:
+#     private:
+#       filename: "{{ bind9_options.key_directory }}/example.com.private"
+#       content: "private key"
+#     public:
+#       filename: "{{ bind9_options.key_directory }}/example.com.private"
+#       content: "public key"
+#   zone_signing_key:
+#     private:
+#       filename: "{{ bind9_options.key_directory }}/example.com.private"
+#       content: "private key"
+#     public:
+#       filename: "{{ bind9_options.key_directory }}/example.com.private"
+#       content: "public key"
+
 bind9_statics:
   enabled: true
   channels:
@@ -103,41 +122,47 @@ bind9_views: []
 #   - "!internalnets"
 #   - "any"
 #   zones:
-#   - allow_notify: []
-#     allow_query:
-#     - "any"
-#     allow_query_on: []
-#     allow_update: []
-#     allow_update_forwarding: []
-#     allow_transfer: []
+#   - config:
+#       allow_notify: []
+#       allow_query:
+#       - "any"
+#       allow_query_on: []
+#       allow_update: []
+#       allow_update_forwarding: []
+#       allow_transfer: []
+#       file: zones/external/db.local.example
+#       origin: "example.local."
+#       type: master
+#       notify: true
 #     file: zones/external/db.local.example
-#     origin: "example.local."
-#     type: master
-#     notify: true
 # - name: internal
 #   match_clients:
 #   - "!192.168.178.1"
 #   - "internalnets"
 #   - "127.0.0.0/8"
 #   zones:
-#   - allow_notify: []
-#     allow_query:
-#     - "any"
-#     allow_query_on: []
-#     allow_update: []
-#     allow_update_forwarding: []
-#     allow_transfer: []
+#   - config:
+#       allow_notify: []
+#       allow_query:
+#       - "any"
+#       allow_query_on: []
+#       allow_update: []
+#       allow_update_forwarding: []
+#       allow_transfer: []
+#       file: zones/internal/db.local.example
+#       origin: "example.local."
+#       type: master
 #     file: zones/internal/db.local.example
-#     origin: "example.local."
-#     type: master
-#   - allow_notify: []
-#     allow_query: []
-#     allow_query_on: []
-#     allow_update: []
-#     allow_update_forwarding: []
-#     allow_transfer: []
-#     forward: only
-#     forwarders:
-#     - 192.168.175.1
-#     origin: "gitlab-runner.external.local."
-#     type: forward
+#   - config:
+#       allow_notify: []
+#       allow_query: []
+#       allow_query_on: []
+#       allow_update: []
+#       allow_update_forwarding: []
+#       allow_transfer: []
+#       forward: only
+#       forwarders:
+#       - 192.168.175.1
+#       origin: "gitlab-runner.external.local"
+#       type: forward
+#     file: "gitlab-runner.external.local"

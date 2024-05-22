@@ -13,7 +13,7 @@ view "{{ view.name }}" {
   };
 
 {% for zone in view.zones %}
-  zone "{{ zone.origin }}" {
+  zone "{{ zone.config.origin }}" {
 
     # Hosts which are allowed to issue queries to the server. If not specified all
     # hosts are allowed to make queries (defaults to allow-query {any;};
@@ -21,9 +21,9 @@ view "{{ view.name }}" {
     # NOTE:
     # - The statements may be used in a zone, view or a global options
     #   clause.
-{% if zone.allow_query is defined and zone.allow_query | length > 0 %}
+{% if zone.config.allow_query is defined and zone.config.allow_query | length > 0 %}
     allow-query {
-{% for entry in zone.allow_query %}
+{% for entry in zone.config.allow_query %}
       {{ entry }};
 {% endfor %}
     };
@@ -40,9 +40,9 @@ view "{{ view.name }}" {
     # NOTE:
     # - The statements may be used in a zone, view or a global options
     #   clause.
-{% if zone.allow_query_on is defined and zone.allow_query_on | length > 0 %}
+{% if zone.config.allow_query_on is defined and zone.config.allow_query_on | length > 0 %}
     allow-query {
-{% for entry in zone.allow_query_on %}
+{% for entry in zone.config.allow_query_on %}
       {{ entry }};
 {% endfor %}
     };
@@ -63,9 +63,9 @@ view "{{ view.name }}" {
     #
     # NOTE:
     # - This statement may be used in a zone, view or global options clause.
-{% if zone.allow_transfer is defined and zone.allow_transfer | length > 0 %}
+{% if zone.config.allow_transfer is defined and zone.config.allow_transfer | length > 0 %}
     allow-transfer {
-{% for entry in zone.allow_transfer %}
+{% for entry in zone.config.allow_transfer %}
       key {{ entry }};
 {% endfor %}
     };
@@ -86,9 +86,9 @@ view "{{ view.name }}" {
     #
     # NOTE:
     # - This statement may be used in a zone, view or an options clause.
-{% if zone.allow_update is defined and zone.allow_update | length > 0 %}
+{% if zone.config.allow_update is defined and zone.config.allow_update | length > 0 %}
     allow-update {
-{% for entry in zone.allow_update %}
+{% for entry in zone.config.allow_update %}
       key {{ entry }};
 {% endfor %}
     };
@@ -102,9 +102,9 @@ view "{{ view.name }}" {
     #
     # NOTE:
     # - This statement may be used in zone, view or an options clause.
-{% if zone.allow_update_forwarding is defined and zone.allow_update_forwarding | length > 0 %}
+{% if zone.config.allow_update_forwarding is defined and zone.config.allow_update_forwarding | length > 0 %}
     allow-update-forwarding {
-{% for entry in zone.allow_update_forwarding %}
+{% for entry in zone.config.allow_update_forwarding %}
       {{ entry }};
 {% endfor %}
     };
@@ -129,9 +129,9 @@ view "{{ view.name }}" {
     #   contact the Master, ffor whatever reason, the zone may be left with
     #   no effective Authoritative Name Servers.
 {% if zone.file is defined and zone.file | length > 0 and not zone.file.startswith('/') %}
-    file "{{ bind_config_directory }}/{{ zone.file }}";
+    file "{{ bind_config_directory }}/{{ zone.config.file }}";
 {% elif zone.file is defined and zone.file | length > 0 and zone.file.startswith('/')%}
-    file "{{ zone.file }}";
+    file "{{ zone.config.file }}";
 {% else %}
     # file "{{ bind_config_directory }}/...";
 {% endif %}
@@ -141,8 +141,8 @@ view "{{ view.name }}" {
     # forwarders first; if that does not answer the question, the server then
     # looks for the answer itself. If only is specified, the server only queries
     # the forwarders.
-{% if zone.forward is defined and zone.forward | length > 0 %}
-    forward {{ zone.forward }};
+{% if zone.config.forward is defined and zone.config.forward | length > 0 %}
+    forward {{ zone.config.forward }};
 {% else %}
     # forward first;
 {% endif %}
@@ -152,9 +152,9 @@ view "{{ view.name }}" {
     # associated with an optional port number and/or DSCP value, and a default
     # port number and DSCP value can be set for the entire list.
     # https://bind9.readthedocs.io/en/latest/reference.html#forwarding
-{% if zone.forwarders is defined and zone.forwarders | length > 0 %}
+{% if zone.config.forwarders is defined and zone.config.forwarders | length > 0 %}
     forwarders {
-{% for forwarder in zone.forwarders %}
+{% for forwarder in zone.config.forwarders %}
       {{ forwarder }};
 {% endfor %}
     };
@@ -164,9 +164,9 @@ view "{{ view.name }}" {
 
     # master servers
     # https://bind9.readthedocs.io/en/latest/manpages.html?highlight=masters#masters
-{% if zone.masters is defined and zone.masters | length > 0 %}
+{% if zone.config.masters is defined and zone.config.masters | length > 0 %}
     masters {
-{% for master in zone.masters %}
+{% for master in zone.config.masters %}
       {{ master.ip }} key {{ master.tsigkey}};
 {% endfor %}
     };
@@ -190,9 +190,9 @@ view "{{ view.name }}" {
     # NOTE:
     # - This statement may be specified in zone, view clauses or in a
     #   global options clause.
-{% if zone.notify is defined and zone.notify %}
+{% if zone.config.notify is defined and zone.config.notify %}
     notify yes;
-{% elif zone.notify is defined and not zone.notify %}
+{% elif zone.config.notify is defined and not zone.config.notify %}
     notify no;
 {% else %}
     # notify yes | no;
@@ -216,13 +216,13 @@ view "{{ view.name }}" {
     # is the current date in the form “YYYYMMDD”, followed by two
     # zeroes, unless the existing serial number is already greater than
     # or equal to that value, in which case it is incremented by one.
-{% if zone.serial_update_method is defined %}
-    serial-update-method {{ zone.serial_update_method }};
+{% if zone.config.serial_update_method is defined %}
+    serial-update-method {{ zone.config.serial_update_method }};
 {% else %}
     # serial-update-method [date | increment | unixtime ];
 {% endif %}
 
-    type {{ zone.type }};
+    type {{ zone.config.type }};
 
     # The update-policy clause allows more fine-grained control over which
     # updates are allowed. It specifies a set of rules, in which each rule
@@ -230,9 +230,9 @@ view "{{ view.name }}" {
     # updated by one or more identities. Identity is determined by the key that
     # signed the update request, using either TSIG or SIG(0).
     # https://bind9.readthedocs.io/en/v9_16_5/reference.html#dynamic-update-policies
-{% if zone.update_policies is defined and zone.update_policies | length > 0 %}
+{% if zone.config.update_policies is defined and zone.config.update_policies | length > 0 %}
     update-policy {
-{% for update_policy in zone.update_policies %}
+{% for update_policy in zone.config.update_policies %}
       {{ update_policy.action }} {{ update_policy.identity }} {{ update_policy.ruletype }} {{ update_policy.name | default('') }} {{ update_policy.types | default('') | join(' ') }};
 {% endfor %}
     };

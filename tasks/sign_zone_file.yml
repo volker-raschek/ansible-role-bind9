@@ -1,0 +1,28 @@
+---
+
+- name: "Sign DNS Zone {{ zone.config.origin }}"
+  vars:
+    dnssec_cmd:
+    - dnssec-signzone
+    - -N
+    - INCREMENT
+    - -S
+    - -K
+    - "{{ bind9_options.key_directory }}"
+  block:
+  - name: "Extend dnssec command of ORIGIN"
+    ansible.builtin.set_fact:
+      _dnssec_cmd: "{{ dnssec_cmd + ['-o', zone.config.origin] }}"
+  - name: "Extend dnssec command of zone file"
+    ansible.builtin.set_fact:
+      _dnssec_cmd: "{{ _dnssec_cmd + [bind_config_directory + '/' + zone.file] }}"
+  - name: "Sign zone {{ zone.config.origin }}"
+    ansible.builtin.command:
+      argv: "{{ _dnssec_cmd }}"
+      creates: "{{ bind_config_directory + '/' + zone.file }}.signed"
+  - name: Adapt signed zone file permissions
+    ansible.builtin.file:
+      path: "{{ bind_config_directory + '/' + zone.file }}.signed"
+      owner: "{{ bind_unix_user }}"
+      group: "{{ bind_unix_group }}"
+      mode: "0644"

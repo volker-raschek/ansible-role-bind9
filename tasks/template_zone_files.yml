@@ -1,6 +1,6 @@
 ---
 
-- name: "Create directory for zone {{ zone.file | dirname }}"
+- name: "Create config directory of DNS zone {{ zone.config.origin }}"
   ansible.builtin.file:
     path: "{{ bind_config_directory }}/{{ zone.file | dirname }}"
     owner: "{{ bind_unix_user }}"
@@ -11,7 +11,8 @@
   - "{{ view.zones }}"
   loop_control:
     loop_var: zone
-  when: zone.file is defined and zone.file | length > 0
+  when: zone.file is defined and
+        zone.file | length > 0
 
 - name: "Template view {{ view.name }}"
   ansible.builtin.template:
@@ -24,7 +25,7 @@
   - "{{ view.zones }}"
   loop_control:
     loop_var: zone
-  when: zone.type == 'master'
+  when: zone.config.type == 'master'
   notify: Restart named
 
 - name: Check if last character in zone files is a newline
@@ -33,4 +34,15 @@
   - "{{ view.zones }}"
   loop_control:
     loop_var: zone
-  when: zone.type == 'master'
+  when: zone.config.type == 'master'
+
+- name: Sign Zones
+  ansible.builtin.include_tasks: sign_zone_file.yml
+  with_items:
+  - "{{ view.zones }}"
+  loop_control:
+    loop_var: zone
+  when: zone.config.type == 'master' and
+        bind9_dnssec_keys | selectattr('origin', 'in', zone.config.origin) | map(attribute='zone_signing_key') | length > 0 and
+        (bind9_dnssec_keys | selectattr('origin', 'in', zone.config.origin) | map(attribute='zone_signing_key'))[0].private | length > 0 and
+        (bind9_dnssec_keys | selectattr('origin', 'in', zone.config.origin) | map(attribute='zone_signing_key'))[0].public  | length > 0

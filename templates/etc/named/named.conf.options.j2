@@ -186,9 +186,24 @@ options {
 
   directory "{{ bind_config_directory }}";
 
-  dnssec-validation {{ 'yes' if bind9_options.dnssec_validation else 'no' }};
+  # This accepts expired signatures when verifying DNSSEC signatures. The default is no. Setting this option to yes
+  # leaves named vulnerable to replay attacks.
+  dnssec-accept-expired {{ "yes" if bind9_options.dnssec_accept_expired else "no" }};
 
-  # dump-file "/var/bind/named.dump";
+  # Enables DNSSEC validation in named.
+  #
+  # auto: If set to auto, DNSSEC validation is enabled and a default trust anchor for the DNS root zone is used. This
+  # trust anchor is provided as part of BIND and is kept up-to-date
+  #
+  # yes: If set to yes, DNSSEC validation is enabled, but a trust anchor must be manually configured using a
+  # trust-anchors statement (or the managed-keys or trusted-keys statements, both deprecated). If trust-anchors is not
+  # configured, it is a configuration error. If trust-anchors does not include a valid root key, then validation does
+  # not take place for names which are not covered by any of the configured trust anchors.
+  #
+  # no: If set to no, DNSSEC validation is disabled.
+  #
+  # https://bind9.readthedocs.io/en/latest/reference.html#namedconf-statement-dnssec-validation
+  dnssec-validation {{ bind9_options.dnssec_validation | default('auto') }};
 
 {% if bind9_options.forwarders is defined and bind9_options.forwarders | length > 0 %}
   forwarders {
@@ -230,6 +245,13 @@ options {
 {% endfor %}
   };
 {% endif %}
+
+  # Indicates the directory where public and private DNSSEC key files are found.
+  #
+  # This is the directory where the public and private DNSSEC key files should be found when performing a dynamic update
+  # of secure zones, if different than the current working directory.
+  # https://bind9.readthedocs.io/en/latest/reference.html#namedconf-statement-key-directory
+  key-directory "{{ bind9_options.key_directory }}";
 
   # managed-keys-directory "/var/named/dynamic";
   # memstatistics-file "/var/bind/named.memstats";
