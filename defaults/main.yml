@@ -1,7 +1,7 @@
 ---
 
 bind9_acls:
-- name: internalnets
+- name: "internalnets"
   permissions: []
   # - "111.222.111.222"
 
@@ -117,7 +117,7 @@ bind9_tsigkeys: []
 #   secret: "secret"
 
 bind9_views: []
-# - name: external
+# - name: "external"
 #   match_clients:
 #   - "!internalnets"
 #   - "any"
@@ -135,7 +135,7 @@ bind9_views: []
 #       type: master
 #       notify: true
 #     file: zones/external/db.local.example
-# - name: internal
+# - name: "internal"
 #   match_clients:
 #   - "!192.168.178.1"
 #   - "internalnets"
