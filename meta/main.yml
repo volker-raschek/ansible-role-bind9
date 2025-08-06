@@ -1,27 +1,26 @@
+dependencies: []
 galaxy_info:
-  role_name: bind9
   author: Markus Pesch
-  description: Role to install and configure bind9 on different distributions
   company: Cryptic Systems
+  description: Role to install and configure bind9 on different distributions
+  galaxy_tags:
+    - named
+    - bind
+    - dyndns
   license: MIT
   min_ansible_version: "2.9"
+  namespace: volker-raschek
   platforms:
-  - name: ArchLinux
-    versions:
-    - all
-  - name: EL
-    versions:
-    - all
-  - name: Fedora
-    versions:
-    - all
-  - name: Ubuntu
-    versions:
-    - all
-
-  galaxy_tags:
-  - named
-  - bind
-  - dyndns
-
-dependencies: []
+    - name: ArchLinux
+      versions:
+        - all
+    - name: EL
+      versions:
+        - all
+    - name: Fedora
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  role_name: bind9
