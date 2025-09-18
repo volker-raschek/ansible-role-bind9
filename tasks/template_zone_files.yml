@@ -1,6 +1,6 @@
 ---
 
-- name: "Create config directory of DNS zone {{ zone.config.origin }}"
+- name: "Create config directory of DNS zones"
   ansible.builtin.file:
     path: "{{ bind_config_directory }}/{{ zone.file | dirname }}"
     owner: "{{ bind_unix_user }}"
