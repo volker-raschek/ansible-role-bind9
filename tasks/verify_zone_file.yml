@@ -10,4 +10,4 @@
 - name: "Fail when the last character of DNS zone file is not a newline: {{ bind_config_directory + '/' + zone.file }}"
   ansible.builtin.fail:
     msg: "Last character of DNS zone file is not a newline: {{ bind_config_directory + '/' + zone.file }}"
-  failed_when: _bind9_zone_last_character.stdout | regex_search('.+') | default(false)
+  when: _bind9_zone_last_character.stdout | regex_search('.+')
