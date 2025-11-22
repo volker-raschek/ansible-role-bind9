@@ -1,7 +1,7 @@
 ---
 
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yaml"
 
 - name: Install bind and dependencies
   ansible.builtin.package:
@@ -76,14 +76,14 @@
     state: directory
 
 - name: Create DNSSEC files
-  ansible.builtin.include_tasks: create_dnssec_files.yml
+  ansible.builtin.include_tasks: create_dnssec_files.yaml
   with_items: "{{ bind9_dnssec_keys }}"
   no_log: true
   loop_control:
     loop_var: bind9_dnssec_key
 
 - name: Create DNS-Zone files
-  ansible.builtin.include_tasks: template_zone_files.yml
+  ansible.builtin.include_tasks: template_zone_files.yaml
   with_items:
   - "{{ bind9_views }}"
   loop_control:

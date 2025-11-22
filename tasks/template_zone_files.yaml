@@ -29,7 +29,7 @@
   notify: Restart named
 
 - name: Check if last character in zone files is a newline
-  ansible.builtin.include_tasks: verify_zone_file.yml
+  ansible.builtin.include_tasks: verify_zone_file.yaml
   with_items:
   - "{{ view.zones }}"
   loop_control:
@@ -37,7 +37,7 @@
   when: zone.config.type == 'master'
 
 - name: Sign Zones
-  ansible.builtin.include_tasks: sign_zone_file.yml
+  ansible.builtin.include_tasks: sign_zone_file.yaml
   with_items:
   - "{{ view.zones }}"
   loop_control:
