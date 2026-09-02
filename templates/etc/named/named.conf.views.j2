@@ -15,6 +15,25 @@ view "{{ view.name }}" {
 {% for zone in view.zones %}
   zone "{{ zone.config.origin }}" {
 
+    # allow-notify applies to slave zones only and defines a match list,
+    # e.g. IP address(es), that are allowed to NOTIFY the slave in
+    # addition to those hosts defined in the masters statement. By
+    # default only the hosts of the masters statement may send NOTIFY
+    # messages.
+    #
+    # NOTE:
+    # - This statement may be used in a zone, view or a global options
+    #   clause.
+{% if zone.config.allow_notify is defined and zone.config.allow_notify | length > 0 %}
+    allow-notify {
+{% for entry in zone.config.allow_notify %}
+      {{ entry }};
+{% endfor %}
+    };
+{% else %}
+    # allow-notify {};
+{% endif %}
+
     # Hosts which are allowed to issue queries to the server. If not specified all
     # hosts are allowed to make queries (defaults to allow-query {any;};
     #
@@ -41,7 +60,7 @@ view "{{ view.name }}" {
     # - The statements may be used in a zone, view or a global options
     #   clause.
 {% if zone.config.allow_query_on is defined and zone.config.allow_query_on | length > 0 %}
-    allow-query {
+    allow-query-on {
 {% for entry in zone.config.allow_query_on %}
       {{ entry }};
 {% endfor %}
