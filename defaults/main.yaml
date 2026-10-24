@@ -21,7 +21,7 @@ bind9_logging:
   channels:
   - name: "security_file"
     file:
-      path: "/var/log/named/security.log"
+      path: "{{ bind9_log_directory }}/security.log"
       options: "versions 3 size 30m"
     severity: "dynamic"
     print_times: "yes"
