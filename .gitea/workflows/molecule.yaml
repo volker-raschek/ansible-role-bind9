@@ -1,0 +1,28 @@
+name: Molecule
+
+on:
+  pull_request:
+    types: [ "opened", "reopened", "synchronize" ]
+  push:
+    branches: [ '**' ]
+    tags-ignore: [ '**' ]
+
+permissions:
+  contents: read
+
+jobs:
+  molecule:
+    name: Molecule
+    runs-on: ubuntu-latest-amd64
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        path: bind9
+    - name: Install molecule
+      run: |
+        apt update --yes
+        apt install --yes python3-pip
+        pip3 install --break-system-packages ansible-core molecule docker
+    - name: Run molecule
+      run: molecule test
+      working-directory: bind9

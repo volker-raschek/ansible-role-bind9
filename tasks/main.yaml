@@ -142,7 +142,7 @@
       group: "root"
       mode: "0644"
     register: _bind9_systemd_drop_in
-  - name: Systemd reload
+  - name: Systemd reload  # noqa: no-handler
     ansible.builtin.systemd:
       daemon_reload: true
     when: _bind9_systemd_drop_in.changed
@@ -155,7 +155,7 @@
       path: "{{ bind9_systemd_dropin_dir }}/override.conf"
       state: "absent"
     register: _bind9_systemd_drop_in
-  - name: Systemd reload
+  - name: Systemd reload  # noqa: no-handler
     ansible.builtin.systemd:
       daemon_reload: true
     when: _bind9_systemd_drop_in.changed
