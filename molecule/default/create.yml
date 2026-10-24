@@ -1,0 +1,44 @@
+---
+
+- name: Create
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: Build systemd-enabled test images
+    community.docker.docker_image:
+      name: "bind9-molecule-{{ item.name }}:latest"
+      source: build
+      build:
+        path: "{{ molecule_scenario_directory }}"
+        args:
+          BASE_IMAGE: "{{ item.image }}"
+    loop: "{{ molecule_yml.platforms }}"
+    loop_control:
+      label: "{{ item.name }}"
+
+  - name: Start a systemd container per platform
+    community.docker.docker_container:
+      name: "{{ item.name }}"
+      image: "bind9-molecule-{{ item.name }}:latest"
+      command: /sbin/init
+      state: started
+      privileged: true
+      cgroupns_mode: host
+      tmpfs:
+      - /run
+      - /run/lock
+      volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    loop: "{{ molecule_yml.platforms }}"
+    loop_control:
+      label: "{{ item.name }}"
+
+  - name: Write the instance config
+    ansible.builtin.copy:
+      content: |
+        {% for platform in molecule_yml.platforms %}
+        - instance: {{ platform.name }}
+          connection: community.docker.docker
+        {% endfor %}
+      dest: "{{ molecule_instance_config }}"
+      mode: "0600"

@@ -1,0 +1,12 @@
+---
+
+- name: Prepare
+  hosts: all
+  tasks:
+  - name: Create the parent directory for DNSSEC keys
+    ansible.builtin.file:
+      path: /var/named
+      owner: root
+      group: root
+      mode: "0755"
+      state: directory

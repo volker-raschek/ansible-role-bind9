@@ -1,0 +1,12 @@
+---
+
+- name: Converge
+  hosts: all
+  vars:
+    bind9_systemd_dropin: |
+      [Service]
+      Environment=MOLECULE_BIND9_DROPIN=present
+  tasks:
+  - name: Include the role bind9
+    ansible.builtin.include_role:
+      name: bind9

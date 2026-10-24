@@ -1,0 +1,36 @@
+---
+
+driver:
+  name: default
+  options:
+    managed: true
+    login_cmd_template: "docker exec --interactive --tty {instance} bash"
+
+platforms:
+- name: bind9-archlinux
+  image: docker.io/library/archlinux:base
+- name: bind9-debian
+  image: docker.io/library/debian:13
+- name: bind9-fedora
+  image: registry.fedoraproject.org/fedora:43
+
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
+  config_options:
+    defaults:
+      interpreter_python: auto_silent
+
+scenario:
+  test_sequence:
+  - dependency
+  - cleanup
+  - destroy
+  - syntax
+  - create
+  - prepare
+  - converge
+  - verify
+  - cleanup
+  - destroy

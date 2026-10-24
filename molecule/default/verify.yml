@@ -1,0 +1,29 @@
+---
+
+- name: Verify
+  hosts: all
+  tasks:
+  - name: Validate the generated BIND configuration
+    ansible.builtin.command:
+      argv:
+      - named-checkconf
+      - "{{ '/etc/bind/named.conf' if ansible_facts['os_family'] == 'Debian' else '/etc/named.conf' }}"
+    changed_when: false
+
+  - name: Gather service states
+    ansible.builtin.service_facts:
+
+  - name: Assert that named is active
+    ansible.builtin.assert:
+      that:
+      - ansible_facts.services['named.service'].state == 'running'
+
+  - name: Read the systemd drop-in
+    ansible.builtin.slurp:
+      src: /etc/systemd/system/named.service.d/override.conf
+    register: _bind9_systemd_dropin
+
+  - name: Assert that the configured systemd drop-in was installed
+    ansible.builtin.assert:
+      that:
+      - "'Environment=MOLECULE_BIND9_DROPIN=present' in (_bind9_systemd_dropin.content | b64decode)"
