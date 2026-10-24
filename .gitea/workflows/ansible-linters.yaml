@@ -17,4 +17,5 @@ jobs:
       uses: ansible/ansible-lint@9bce2bfb8f4a984e6b13767bc0d6bf0a49492164 # v26.10.1
       with:
         args: "--config-file .ansible-lint.yml"
+        requirements_file: "molecule/default/collections.yml"
         setup_python: "true"
