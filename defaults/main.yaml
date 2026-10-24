@@ -110,6 +110,10 @@ bind9_statics:
     acls:
     - "localhost"
 
+bind9_systemd_dropin: ~
+# [Service]
+# ExecStart=
+# ExecStart={{ bind9_binary }} -f -u {{ bind9_unix_user }} -4
 
 bind9_tsigkeys: []
 # - name: "name"

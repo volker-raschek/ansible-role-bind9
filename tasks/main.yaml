@@ -17,22 +17,22 @@
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
-  with_items: "{{ bind_package_names }}"
+  with_items: "{{ bind9_package_names }}"
 
 - name: Create logging directory
   ansible.builtin.file:
-    path: "{{ bind_log_directory }}"
-    owner: "{{ bind_unix_user }}"
-    group: "{{ bind_unix_group }}"
+    path: "{{ bind9_log_directory }}"
+    owner: "{{ bind9_unix_user }}"
+    group: "{{ bind9_unix_group }}"
     mode: "0755"
     state: directory
     recurse: true
 
 - name: Create config directory
   ansible.builtin.file:
-    path: "{{ bind_config_directory }}"
-    owner: "{{ bind_unix_user }}"
-    group: "{{ bind_unix_group }}"
+    path: "{{ bind9_config_directory }}"
+    owner: "{{ bind9_unix_user }}"
+    group: "{{ bind9_unix_group }}"
     mode: "0755"
     state: directory
     recurse: true
@@ -41,7 +41,7 @@
   block:
   - name: Find existing journal files
     ansible.builtin.find:
-      path: "{{ bind_config_directory }}"
+      path: "{{ bind9_config_directory }}"
       recurse: true
       patterns: "*.jnl"
     register: files_to_delete
@@ -55,7 +55,7 @@
   block:
   - name: Find existing signed zone files
     ansible.builtin.find:
-      path: "{{ bind_config_directory }}"
+      path: "{{ bind9_config_directory }}"
       recurse: true
       patterns: "*.signed"
     register: files_to_delete
@@ -80,8 +80,8 @@
 - name: Create DNSSEC key directory
   ansible.builtin.file:
     path: "{{ bind9_options.key_directory }}"
-    owner: "{{ bind_unix_user }}"
-    group: "{{ bind_unix_group }}"
+    owner: "{{ bind9_unix_user }}"
+    group: "{{ bind9_unix_group }}"
     mode: "0700"
     state: directory
 
@@ -102,18 +102,18 @@
 - name: Create main configuration file
   ansible.builtin.template:
     src: "etc/named.conf.j2"
-    dest: "{{ bind_main_config }}"
-    owner: "{{ bind_unix_user }}"
-    group: "{{ bind_unix_group }}"
+    dest: "{{ bind9_main_config }}"
+    owner: "{{ bind9_unix_user }}"
+    group: "{{ bind9_unix_group }}"
     mode: "0644"
   notify: Restart named
 
 - name: Create excluded configuration files
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ item | replace('etc/named', bind_config_directory) }}"
-    owner: "{{ bind_unix_user }}"
-    group: "{{ bind_unix_group }}"
+    dest: "{{ item | replace('etc/named', bind9_config_directory) }}"
+    owner: "{{ bind9_unix_user }}"
+    group: "{{ bind9_unix_group }}"
     mode: "0644"
   with_items:
   - etc/named.conf
@@ -124,9 +124,45 @@
   - etc/named/named.conf.views
   notify: Restart named
 
+- name: Create systemd drop-in
+  when: bind9_systemd_dropin | default('', true) | length > 0
+  block:
+  - name: Create systemd drop-in directory
+    ansible.builtin.file:
+      path: "{{ bind9_systemd_dropin_dir }}"
+      owner: "root"
+      group: "root"
+      mode: "0755"
+      state: "directory"
+  - name: Template systemd drop-in
+    ansible.builtin.template:
+      src: etc/systemd/system/named.service.d/override.conf.j2
+      dest: "{{ bind9_systemd_dropin_dir }}/override.conf"
+      owner: "root"
+      group: "root"
+      mode: "0644"
+    register: _bind9_systemd_drop_in
+  - name: Systemd reload
+    ansible.builtin.systemd:
+      daemon_reload: true
+    when: _bind9_systemd_drop_in.changed
+
+- name: Remove systemd drop-in
+  when: bind9_systemd_dropin | default('', true) | length == 0
+  block:
+  - name: Remove systemd drop-in file
+    ansible.builtin.file:
+      path: "{{ bind9_systemd_dropin_dir }}/override.conf"
+      state: "absent"
+    register: _bind9_systemd_drop_in
+  - name: Systemd reload
+    ansible.builtin.systemd:
+      daemon_reload: true
+    when: _bind9_systemd_drop_in.changed
+
 - name: Start and enabled named
   ansible.builtin.systemd:
-    name: named
+    name: "{{ bind9_service_name }}"
     state: started
     enabled: true
 
@@ -134,8 +170,8 @@
   ansible.builtin.template:
     src: etc/rndc.key.j2
     dest: /etc/rndc.key
-    owner: "{{ bind_unix_user }}"
-    group: "{{ bind_unix_group }}"
+    owner: "{{ bind9_unix_user }}"
+    group: "{{ bind9_unix_group }}"
     mode: "0600"
   when: bind9_rndc_key.name | length > 0 and
         bind9_rndc_key.algorithm | length > 0 and

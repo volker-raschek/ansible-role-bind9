@@ -1,13 +1,16 @@
 ---
 
-bind_main_config: /etc/named.conf
-bind_config_directory: /etc/named
-bind_log_directory: /var/log/named
+bind9_binary: /usr/bin/named
 
-bind_package_names:
+bind9_main_config: /etc/named.conf
+bind9_config_directory: /etc/named
+bind9_log_directory: /var/log/named
+
+bind9_package_names:
 - bind
 
-bind_service_name: named
+bind9_service_name: named
+bind9_systemd_dropin_dir: "/etc/systemd/system/{{ bind9_service_name }}.service.d"
 
-bind_unix_user: named
-bind_unix_group: named
+bind9_unix_user: named
+bind9_unix_group: named

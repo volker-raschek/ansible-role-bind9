@@ -184,7 +184,7 @@ options {
   # allow-update-forwarding {};
 {% endif %}
 
-  directory "{{ bind_config_directory }}";
+  directory "{{ bind9_config_directory }}";
 
   # This accepts expired signatures when verifying DNSSEC signatures. The default is no. Setting this option to yes
   # leaves named vulnerable to replay attacks.

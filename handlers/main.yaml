@@ -2,6 +2,6 @@
 
 - name: Restart named
   ansible.builtin.systemd:
-    name: "{{ bind_service_name }}"
+    name: "{{ bind9_service_name }}"
     state: restarted
     daemon_reload: true
