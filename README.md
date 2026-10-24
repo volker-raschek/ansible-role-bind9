@@ -1,6 +1,6 @@
 # bind9-role
 
-[![Ansible Role](https://img.shields.io/ansible/role/d/58170)](https://galaxy.ansible.com/volker_raschek/bind9)
+[![Ansible Role](https://img.shields.io/ansible/role/d/volker-raschek/bind9)](https://galaxy.ansible.com/ui/standalone/roles/volker-raschek/bind9/)
 
 With following role can be bind installed and configured.
 
